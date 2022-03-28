@@ -36,7 +36,7 @@
           </section>
         </div>
         <div v-if="isActive">
-          <section class="flex items-center justify-center flex-col mt-5">
+          <section v-if="weather.cod != '404'" class="flex items-center justify-center flex-col mt-5">
             <div v-html="weatherIcon(weather.weather[0].main)" class="my-4"></div>
             <div class="temp flex font-medium text-7xl">
               <span class="numb font-semibold">{{ Math.round(weather.main.temp) }}</span>
@@ -67,6 +67,9 @@
                 </div>
               </div>
             </div>
+          </section>
+          <section v-else class="flex items-center justify-center flex-col my-5">
+            <p class="p-4 bg-red-100 text-red-700 rounded font-semibold">Введите правильное название города</p>
           </section>
         </div>
       </div>
