@@ -68,7 +68,7 @@
               </div>
             </div>
           </section>
-          <section v-else class="flex items-center justify-center flex-col my-5">
+          <section v-else-if="weather.cod == '404'" class="flex items-center justify-center flex-col my-5">
             <p class="p-4 bg-red-100 text-red-700 rounded font-semibold">Введите правильное название города</p>
           </section>
         </div>
