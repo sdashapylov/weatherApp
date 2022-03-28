@@ -5,13 +5,12 @@
         <header
           class="flex text-xl font-bold p-4 text-teal-500 items-center border-b border-b-slate-400"
         >
-            <box-icon
-              v-on:click="returnForm"
-              v-if="isActive"
-              name="left-arrow-alt"
-              class="text-lg cursor-pointer mr-2 text-teal-500"
-            ></box-icon>
-          Погода
+          <box-icon
+            v-on:click="returnForm"
+            v-if="isActive"
+            name="left-arrow-alt"
+            class="text-lg cursor-pointer mr-2 text-teal-500"
+          ></box-icon>Погода
         </header>
         <div v-if="isActive == false">
           <section class="input-part m-8">
@@ -30,13 +29,17 @@
                 class="separator h-px w-full flex items-center justify-center relative bg-slate-400 my-8 before:content-['или'] before:text-slate-400 before:px-4 before:bg-white before:text-lg"
               ></div>
               <button
+                v-on:click="fetchWeatherWithGeo"
                 class="text-white h-14 rounded-md text-md bg-teal-500 hover:bg-teal-700 w-full"
               >Получить по геолокации</button>
             </div>
           </section>
         </div>
         <div v-if="isActive">
-          <section v-if="weather.cod != '404'" class="flex items-center justify-center flex-col mt-5">
+          <section
+            v-if="weather.cod != '404'"
+            class="flex items-center justify-center flex-col mt-5"
+          >
             <div v-html="weatherIcon(weather.weather[0].main)" class="my-4"></div>
             <div class="temp flex font-medium text-7xl">
               <span class="numb font-semibold">{{ Math.round(weather.main.temp) }}</span>
@@ -68,8 +71,13 @@
               </div>
             </div>
           </section>
-          <section v-else-if="weather.cod == '404'" class="flex items-center justify-center flex-col my-5">
-            <p class="p-4 bg-red-100 text-red-700 rounded font-semibold">Введите правильное название города</p>
+          <section
+            v-else-if="weather.cod == '404'"
+            class="flex items-center justify-center flex-col my-5"
+          >
+            <p
+              class="p-4 bg-red-100 text-red-700 rounded font-semibold"
+            >Введите правильное название города</p>
           </section>
         </div>
       </div>
@@ -82,6 +90,7 @@ export default {
   name: 'app',
   data() {
     return {
+      api: '',
       api_key: '6b78e03a709725a5de19f3a252da8286',
       query: '',
       weather: {},
@@ -91,11 +100,23 @@ export default {
   methods: {
     fetchWeather(e) {
       if (e.key == "Enter") {
-        fetch(`http://api.openweathermap.org/data/2.5/weather?q=${this.query}&units=metric&APPID=${this.api_key}`)
-          .then(response => {
-            return response.json();
-          }).then(this.weatherResult);
+        this.api = `http://api.openweathermap.org/data/2.5/weather?q=${this.query}&units=metric&APPID=${this.api_key}`;
+        this.fetchData(this.api);
       }
+    },
+    fetchWeatherWithGeo() {
+      navigator.geolocation.getCurrentPosition(pos => {
+        this.latitude = pos.coords.latitude;
+        this.longitude = pos.coords.longitude;
+        this.api = `https://api.openweathermap.org/data/2.5/weather?lat=${this.latitude}&lon=${this.longitude}&units=metric&appid=${this.api_key}`;
+        this.fetchData(this.api);
+      });
+    },
+    fetchData() {
+      fetch(this.api)
+      .then(response => {
+        return response.json();
+      }).then(this.weatherResult);
     },
     weatherResult(result) {
       this.weather = result;
@@ -126,18 +147,3 @@ export default {
   },
 }
 </script>
-
-<style scoped>
-.input-part .info-txt.error {
-  color: #721c24;
-  display: block;
-  background: #f8d7da;
-  border: 1px solid #f5c6cb;
-}
-.input-part .info-txt.pending {
-  color: #0c5460;
-  display: block;
-  background: #d1ecf1;
-  border: 1px solid #bee5eb;
-}
-</style>
